@@ -12,7 +12,7 @@ public interface ITagsService
 
 	Task<(TagGroup?, ResultError?)> GetGroupAsync(Guid callerId, Guid tagGroupId);
 
-	Task<(List<Tag>, ResultError?)> ListTagsAsync(Guid callerId, RequestListTagsDto requestDto);
+	Task<(List<Tag>, ResultError?)> ListTagsAsync(Guid callerId, Guid tagGroupid, RequestListTagsDto requestDto);
 
 	Task<ResultError?> EditTagAsync(Guid callerId, Guid tagId, RequestEditTagDto requestDto);
 	Task<ResultError?> EditGroupAsync(Guid callerId, Guid tagGroupid, RequestEditTagGroupDto requestDto);
@@ -97,25 +97,22 @@ public class TagsService : ITagsService
 		return (tagGroup, null);
 	}
 
-	public async Task<(List<Tag>?, ResultError?)> ListTagsAsync(Guid callerId, RequestListTagsDto requestDto)
+	public async Task<(List<Tag>?, ResultError?)> ListTagsAsync(Guid callerId, Guid tagGroupId, RequestListTagsDto requestDto)
 	{
 		var query = _dbContext.Set<Tag>().AsQueryable();
 
-		if (requestDto.TagGroupId != null)
-		{
-			var tagGroup = await _dbContext.Set<TagGroup>().FindAsync(requestDto.TagGroupId);
-			if (tagGroup == null)
-				return (null, new ResultError(404, "Tag Group was not found."));
+		var tagGroup = await _dbContext.Set<TagGroup>().FindAsync(tagGroupId);
+		if (tagGroup == null)
+			return (null, new ResultError(404, "Tag Group was not found."));
 
-			var (caller, error) = await _userService.GetUserAsync(callerId);
-			if (error != null)
-				return (null, error);
+		var (caller, error) = await _userService.GetUserAsync(callerId);
+		if (error != null)
+			return (null, error);
 
-			if (tagGroup.OwnerId != callerId && !caller!.IsAdmin)
-				return (null, new ResultError(403, "Tag Group is owned by another user. Edit forbidden."));
+		if (tagGroup.OwnerId != callerId && !caller!.IsAdmin)
+			return (null, new ResultError(403, "Tag Group is owned by another user. Edit forbidden."));
 
-			query = query.Where(x => x.GroupId == requestDto.TagGroupId);
-		}
+		query = query.Where(x => x.GroupId == tagGroupId);
 
 		var callerTags = await query.Where(x => x.OwnerId == callerId).ToListAsync();
 		var publicTags = await query.Where(x => x.OwnerId == null).ToListAsync();
@@ -140,7 +137,12 @@ public class TagsService : ITagsService
 				return new ResultError(403, "Tag is owned by another user. Edit forbidden.");
 
 			if (requestDto.Name != null)
+			{
+				if (string.IsNullOrEmpty(requestDto.Name))
+					return new ResultError(400, "Tag name must not be empty.");
+				
 				existingEntity.Name = requestDto.Name;
+			}
 
 			if (requestDto.TagGroupId != null)
 			{
@@ -186,7 +188,12 @@ public class TagsService : ITagsService
 				return new ResultError(403, "Tag Group is owned by another user. Edit forbidden.");
 
 			if (requestDto.Name != null)
+			{
+				if (string.IsNullOrEmpty(requestDto.Name))
+					return new ResultError(400, "Tag Group name must not be empty.");
+				
 				existingEntity.Name = requestDto.Name;
+			}
 
 			if (requestDto.ParentTagGroupId != null)
 			{

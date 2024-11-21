@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Saitynai.Backend.Contracts.Models;
 using Saitynai.Backend.Extensions;
 using Saitynai.Backend.Services;
+using System.ComponentModel.DataAnnotations;
 using static Saitynai.Backend.Controllers.NotesController;
 
 namespace Saitynai.Backend.Controllers;
@@ -22,6 +23,7 @@ public class TagGroupsController : ControllerBase
 	public class RequestCreateTagGroupDto
 	{
 		public Guid? ParentGroupId { get; set; }
+		[MinLength(1), MaxLength(100)]
 		public required string Name { get; set; }
 	}
 
@@ -40,6 +42,7 @@ public class TagGroupsController : ControllerBase
 
 	public class RequestCreateTagDto
 	{
+		[MinLength(1), MaxLength(100)]
 		public required string Name { get; set; }
 	}
 	[HttpPost("{tagGroupId:guid}/tags")]
@@ -75,8 +78,7 @@ public class TagGroupsController : ControllerBase
 
 	public class RequestListTagsDto
 	{
-		public Guid? TagGroupId { get; set; }
-		public bool IncludePublicTags { get; set; }
+		public bool? IncludePublicTags { get; set; }
 	}
 	public class ResponseListTagDto
 	{
@@ -85,12 +87,12 @@ public class TagGroupsController : ControllerBase
 		public required string Name { get; set; }
 		public required Guid? OwnerId { get; set; }
 	}
-	[HttpGet("tags")]
-	public async Task<ActionResult<List<Tag>>> ListAsync([FromQuery] RequestListTagsDto requestDto)
+	[HttpGet("{tagGroupId:guid}/tags")]
+	public async Task<ActionResult<List<Tag>>> ListAsync([FromRoute] Guid tagGroupId, [FromQuery] RequestListTagsDto requestDto)
 	{
 		var userId = User.GetUserId();
 
-		var (tags, error) = await _tagsService.ListTagsAsync(userId, requestDto);
+		var (tags, error) = await _tagsService.ListTagsAsync(userId, tagGroupId, requestDto);
 		if (error != null)
 			return StatusCode(error.StatusCode, error.Message);
 

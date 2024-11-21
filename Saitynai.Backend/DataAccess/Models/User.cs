@@ -21,6 +21,8 @@ public class User : IEntity
 	public List<Note> Contents { get; set; }
 	public List<TagGroup> TagGroups { get; set; }
 
+	public static Guid UserId { get; } = new Guid("b07f84e9-8074-4e0e-ae18-644bd9d45ee5");
+
 	public static void CreateModel(ModelBuilder modelBuilder)
 	{
 		modelBuilder.Entity<User>(x =>

@@ -10,6 +10,7 @@ public interface INotesService
 {
 	Task<Note> CreateAsync(Guid callerId, string content);
 	Task<(Note?, ResultError?)> GetAsync(Guid callerId, Guid noteId);
+	Task<(Note?, ResultError?)> ListNoteTagsAsync(Guid callerId, Guid noteId);
 	Task<List<ResponseListNoteDto>> ListPersonalNotesAsync(Guid callerId);
 	Task<ResultError?> ComputeEmbeddingsAsync(Guid callerId, Guid noteId);
 	Task<ResultError?> EditContentAsync(Guid callerId, Guid noteId, string newContent);
@@ -63,9 +64,26 @@ public class NotesService : INotesService
 			return (null, error);
 
 		if (note.OwnerId != callerId && !caller.IsAdmin)
-		{
 			return (null, new ResultError(403, "Note belongs to another user."));
-		}
+
+		return (note, null);
+	}
+
+	public async Task<(Note?, ResultError?)> ListNoteTagsAsync(Guid callerId, Guid noteId)
+	{
+		var note = await _dbContext.Set<Note>()
+			.Include(x => x.Tags)
+				.ThenInclude(x => x.Tag)
+			.FirstOrDefaultAsync(x => x.Id == noteId);
+		if (note == null)
+			return (null, new ResultError(404, "Note not found."));
+
+		var (caller, error) = await _userService.GetUserAsync(callerId);
+		if (error != null)
+			return (null, error);
+
+		if (note.OwnerId != callerId && !caller.IsAdmin)
+			return (null, new ResultError(403, "Note belongs to another user."));
 
 		return (note, null);
 	}
@@ -146,9 +164,7 @@ public class NotesService : INotesService
 				return error;
 
 			if (note.OwnerId != callerId && !caller.IsAdmin)
-			{
 				return new ResultError(403, "Note belongs to another user.");
-			}
 
 			note.Content = newContent;
 			if (note.Embedding != null)

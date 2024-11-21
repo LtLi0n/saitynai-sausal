@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Saitynai.Backend.Contracts.Models;
 using Saitynai.Backend.Extensions;
 using Saitynai.Backend.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace Saitynai.Backend.Controllers;
 
@@ -20,6 +21,8 @@ public class NotesController : ControllerBase
 
 	public class RequestCreateNoteDto
 	{
+		[MinLength(10)]
+		[MaxLength(10_000)]
 		public required string Content { get; set; }
 	}
 
@@ -71,6 +74,41 @@ public class NotesController : ControllerBase
 		return Ok(notes);
 	}
 
+	public class ResponseNoteTagsDto
+	{
+		public required Guid NoteId { get; set; }
+		public required List<ResponseTagDto> Tags { get; set; } = [];
+	}
+	public class ResponseTagDto
+	{
+		public required Guid Id { get; set; }
+		public required Guid TagGroupId { get; set; }
+		public required string Name { get; set; }
+	}
+
+	[HttpGet("{noteId:guid}/tags")]
+	public async Task<ActionResult<ResponseNoteTagsDto>> ListNoteTagsAsync([FromRoute] Guid noteId)
+	{
+		var userId = User.GetUserId();
+
+		var (note, error) = await _notesService.ListNoteTagsAsync(userId, noteId);
+		if (error != null)
+			return StatusCode(error.StatusCode, error.Message);
+
+		var responseDto = new ResponseNoteTagsDto()
+		{
+			NoteId = note.Id,
+			Tags = note.Tags.Select(x => new ResponseTagDto
+			{
+				Id = x.Id,
+				TagGroupId = x.Tag.GroupId,
+				Name = x.Tag.Name
+			}).ToList()
+		};
+
+		return Ok(responseDto);
+	}
+
 	[HttpPost("{noteId:guid}/compute-embedding")]
 	public async Task<IActionResult> ComputeEmbeddingsAsync([FromRoute] Guid noteId)
 	{
@@ -85,6 +123,8 @@ public class NotesController : ControllerBase
 
 	public class RequestEditContentDto
 	{
+		[MinLength(10)]
+		[MaxLength(10_000)]
 		public string NewContent { get; set; }
 	}
 	[HttpPatch("{noteId:guid}")]

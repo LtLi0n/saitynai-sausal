@@ -18,6 +18,23 @@ public class NoteTag : IEntity
 
 	public static void CreateModel(ModelBuilder modelBuilder)
 	{
-		modelBuilder.Entity<NoteTag>();
+		modelBuilder.Entity<NoteTag>(x =>
+		{
+			x.HasData(new List<NoteTag>()
+			{
+				new NoteTag()
+				{
+					Id = new("9acad4bd-aa3e-42e5-8496-c18b1ba2b2c9"),
+					NoteId = Note.Id1,
+					TagId = Tag.Id1,
+				},
+				new NoteTag()
+				{
+					Id = new("61724840-f4f5-4286-9b73-d56dd059b1dc"),
+					NoteId = Note.Id1,
+					TagId = Tag.Id2,
+				},
+			});
+		});
 	}
 }

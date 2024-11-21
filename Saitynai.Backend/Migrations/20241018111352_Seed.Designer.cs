@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
@@ -12,9 +13,11 @@ using Saitynai.Backend.Services;
 namespace Saitynai.Backend.Migrations
 {
     [DbContext(typeof(SaitynaiDbContext))]
-    partial class SaitynaiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241018111352_Seed")]
+    partial class Seed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,7 +88,6 @@ namespace Saitynai.Backend.Migrations
             modelBuilder.Entity("Saitynai.Backend.Contracts.Models.NoteTag", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
@@ -103,24 +105,7 @@ namespace Saitynai.Backend.Migrations
                     b.HasIndex("NoteId")
                         .HasDatabaseName("ix_note_tags_note_id");
 
-                    b.HasIndex("TagId")
-                        .HasDatabaseName("ix_note_tags_tag_id");
-
                     b.ToTable("note_tags", "saitynai");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("9acad4bd-aa3e-42e5-8496-c18b1ba2b2c9"),
-                            NoteId = new Guid("b0c5301d-4a02-427d-bb10-2a23b281d2fc"),
-                            TagId = new Guid("51532d76-1926-4adb-9173-85485876ea42")
-                        },
-                        new
-                        {
-                            Id = new Guid("61724840-f4f5-4286-9b73-d56dd059b1dc"),
-                            NoteId = new Guid("b0c5301d-4a02-427d-bb10-2a23b281d2fc"),
-                            TagId = new Guid("331226db-d78d-4dd4-aaab-fb9c2e92d84a")
-                        });
                 });
 
             modelBuilder.Entity("Saitynai.Backend.Contracts.Models.Tag", b =>
@@ -324,19 +309,19 @@ namespace Saitynai.Backend.Migrations
 
             modelBuilder.Entity("Saitynai.Backend.Contracts.Models.NoteTag", b =>
                 {
+                    b.HasOne("Saitynai.Backend.Contracts.Models.Tag", "Tag")
+                        .WithMany("Contents")
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_note_tags_tags_id");
+
                     b.HasOne("Saitynai.Backend.Contracts.Models.Note", "Note")
                         .WithMany("Tags")
                         .HasForeignKey("NoteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_note_tags_notes_note_id");
-
-                    b.HasOne("Saitynai.Backend.Contracts.Models.Tag", "Tag")
-                        .WithMany("Contents")
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_note_tags_tags_tag_id");
 
                     b.Navigation("Note");
 
