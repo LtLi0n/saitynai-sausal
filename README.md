@@ -74,3 +74,13 @@
 - **React**
 - **ASP.NET**
 - **PostgreSQL**
+
+
+## UML deployment diagrama:
+![alt text](90d27245-3a95-42b6-bd87-e24657d38e90.png "Deployment diagram")
+
+## Išvados
+- Plėtinys [pg_vector](https://github.com/pgvector/pgvector) ir biblioteka [Pgvector.EntityFrameworkCore](https://github.com/pgvector/pgvector-dotnet) leidžia lengvai saugoti ir lyginti vektorinius atvaizdžius.
+- Vektorinis matmuo nėra nustatyas, todėl galima pakeisti naudojamą modelį nekeičiant duomenų bazės struktūros. Dabartinis modelis: [text-embedding-3-small](https://openai.com/index/new-embedding-models-and-api-updates/).
+- Žymių pasiūlymų tikslumas priklauso nuo esamų duomenų kiekio.
+- Žymių grupės palengvina žymių organizavimą.
