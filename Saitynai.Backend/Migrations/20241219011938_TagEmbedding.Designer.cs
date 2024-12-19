@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
@@ -12,9 +13,11 @@ using Saitynai.Backend.Services;
 namespace Saitynai.Backend.Migrations
 {
     [DbContext(typeof(SaitynaiDbContext))]
-    partial class SaitynaiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241219011938_TagEmbedding")]
+    partial class TagEmbedding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,10 +57,6 @@ namespace Saitynai.Backend.Migrations
                         .HasColumnType("text")
                         .HasColumnName("content");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
                     b.Property<Guid?>("EmbeddingId")
                         .HasColumnType("uuid")
                         .HasColumnName("embedding_id");
@@ -82,7 +81,6 @@ namespace Saitynai.Backend.Migrations
                         {
                             Id = new Guid("b0c5301d-4a02-427d-bb10-2a23b281d2fc"),
                             Content = "Seeded note.",
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             OwnerId = new Guid("b07f84e9-8074-4e0e-ae18-644bd9d45ee5")
                         });
                 });

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
@@ -12,9 +13,11 @@ using Saitynai.Backend.Services;
 namespace Saitynai.Backend.Migrations
 {
     [DbContext(typeof(SaitynaiDbContext))]
-    partial class SaitynaiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241218192408_TagGroupCreatedAt")]
+    partial class TagGroupCreatedAt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,10 +57,6 @@ namespace Saitynai.Backend.Migrations
                         .HasColumnType("text")
                         .HasColumnName("content");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
                     b.Property<Guid?>("EmbeddingId")
                         .HasColumnType("uuid")
                         .HasColumnName("embedding_id");
@@ -82,7 +81,6 @@ namespace Saitynai.Backend.Migrations
                         {
                             Id = new Guid("b0c5301d-4a02-427d-bb10-2a23b281d2fc"),
                             Content = "Seeded note.",
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             OwnerId = new Guid("b07f84e9-8074-4e0e-ae18-644bd9d45ee5")
                         });
                 });
@@ -135,14 +133,6 @@ namespace Saitynai.Backend.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<Vector>("Embedding")
-                        .HasColumnType("vector")
-                        .HasColumnName("embedding");
-
                     b.Property<Guid>("GroupId")
                         .HasColumnType("uuid")
                         .HasColumnName("group_id");
@@ -170,6 +160,49 @@ namespace Saitynai.Backend.Migrations
                         .HasDatabaseName("ix_tags_name_group_id_owner_id");
 
                     b.ToTable("tags", "saitynai");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("51532d76-1926-4adb-9173-85485876ea42"),
+                            GroupId = new Guid("7e9a83c8-2bac-418b-af6b-8ddc2ec34ae7"),
+                            Name = "Seeded tag 1",
+                            OwnerId = new Guid("b07f84e9-8074-4e0e-ae18-644bd9d45ee5")
+                        },
+                        new
+                        {
+                            Id = new Guid("331226db-d78d-4dd4-aaab-fb9c2e92d84a"),
+                            GroupId = new Guid("7e9a83c8-2bac-418b-af6b-8ddc2ec34ae7"),
+                            Name = "Seeded tag 2",
+                            OwnerId = new Guid("b07f84e9-8074-4e0e-ae18-644bd9d45ee5")
+                        });
+                });
+
+            modelBuilder.Entity("Saitynai.Backend.Contracts.Models.TagEmbedding", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("EmbeddingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("embedding_id");
+
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tag_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tag_embeddings");
+
+                    b.HasIndex("EmbeddingId")
+                        .HasDatabaseName("ix_tag_embeddings_embedding_id");
+
+                    b.HasIndex("TagId")
+                        .HasDatabaseName("ix_tag_embeddings_tag_id");
+
+                    b.ToTable("tag_embeddings", "saitynai");
                 });
 
             modelBuilder.Entity("Saitynai.Backend.Contracts.Models.TagGroup", b =>
@@ -337,6 +370,27 @@ namespace Saitynai.Backend.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("Saitynai.Backend.Contracts.Models.TagEmbedding", b =>
+                {
+                    b.HasOne("Saitynai.Backend.Contracts.Models.Embedding", "Embedding")
+                        .WithMany()
+                        .HasForeignKey("EmbeddingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_tag_embeddings_embeddings_embedding_id");
+
+                    b.HasOne("Saitynai.Backend.Contracts.Models.Tag", "Tag")
+                        .WithMany("Embeddings")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired()
+                        .HasConstraintName("fk_tag_embeddings_tags_tag_id");
+
+                    b.Navigation("Embedding");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("Saitynai.Backend.Contracts.Models.TagGroup", b =>
                 {
                     b.HasOne("Saitynai.Backend.Contracts.Models.User", "Owner")
@@ -363,6 +417,8 @@ namespace Saitynai.Backend.Migrations
             modelBuilder.Entity("Saitynai.Backend.Contracts.Models.Tag", b =>
                 {
                     b.Navigation("Contents");
+
+                    b.Navigation("Embeddings");
                 });
 
             modelBuilder.Entity("Saitynai.Backend.Contracts.Models.TagGroup", b =>

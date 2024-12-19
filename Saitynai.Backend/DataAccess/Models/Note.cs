@@ -22,6 +22,8 @@ public class Note : IEntity, IOwnableEntity
 
 	public static Guid Id1 { get; } = new("b0c5301d-4a02-427d-bb10-2a23b281d2fc");
 
+	public DateTime CreatedAt { get; set; }
+
 	public static void CreateModel(ModelBuilder modelBuilder)
 	{
 		modelBuilder.Entity<Note>(x =>

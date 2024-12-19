@@ -56,6 +56,38 @@ public class TagGroupsController : ControllerBase
 		return Ok(tag);
 	}
 
+	public class ResponseListRootTagGroupsDto
+	{
+		public required Guid Id { get; set; }
+		public required string Name { get; set; }
+		public required string? CreatedBy { get; set; }
+		public required bool IsMine { get; set; }
+	}
+
+	[HttpGet("list/{parentGroupId:guid?}")]
+	public async Task<ActionResult<List<ResponseListRootTagGroupsDto>>> ListRootGroupsAsync([FromRoute] Guid? parentGroupId)
+	{
+		var userId = User.GetUserId();
+		var (groups, error) = await _tagsService.ListGroupsAsync(userId, parentGroupId);
+		if (error != null)
+			return StatusCode(error.StatusCode, error.Message);
+
+		var toReturn = groups.Select(x => ToDto(x, userId)).ToList();
+		return Ok(toReturn);
+	}
+
+	private static ResponseListRootTagGroupsDto ToDto(TagGroup tagGroup, Guid userId)
+	{
+		return new ResponseListRootTagGroupsDto
+		{
+			Id = tagGroup.Id,
+			Name = tagGroup.Name,
+			CreatedBy = tagGroup.Owner?.Username,
+			IsMine = tagGroup.OwnerId == userId,
+		};
+	}
+
+
 	public class ResponseGetTagGroupDto
 	{
 		public required Guid Id { get; set; }
@@ -86,6 +118,7 @@ public class TagGroupsController : ControllerBase
 		public required Guid GroupId { get; set; }
 		public required string Name { get; set; }
 		public required Guid? OwnerId { get; set; }
+		public required bool? IsMine { get; set; }
 	}
 	[HttpGet("{tagGroupId:guid}/tags")]
 	public async Task<ActionResult<List<Tag>>> ListAsync([FromRoute] Guid tagGroupId, [FromQuery] RequestListTagsDto requestDto)
@@ -102,6 +135,7 @@ public class TagGroupsController : ControllerBase
 			GroupId = x.GroupId,
 			Name = x.Name,
 			OwnerId = x.OwnerId,
+			IsMine = x.OwnerId == userId
 		}).ToList();
 
 		return Ok(toReturn);

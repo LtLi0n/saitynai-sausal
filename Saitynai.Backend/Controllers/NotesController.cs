@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Saitynai.Backend.Contracts.Models;
+using Saitynai.Backend.Core;
 using Saitynai.Backend.Extensions;
 using Saitynai.Backend.Services;
 using System.ComponentModel.DataAnnotations;
@@ -63,13 +64,14 @@ public class NotesController : ControllerBase
 	{
 		public required Guid Id { get; set; }
 		public required string Content { get; set; }
+		public required List<string> Tags { get; set; }
 	}
 	[HttpGet]
-	public async Task<ActionResult<List<ResponseListNoteDto>>> ListPersonalNotesAsync()
+	public async Task<ActionResult<List<ResponseListNoteDto>>> ListPersonalNotesAsync([FromQuery] RequestListNotesDto requestDto)
 	{
 		var userId = User.GetUserId();
-		
-		var notes = await _notesService.ListPersonalNotesAsync(userId);
+
+		var notes = await _notesService.ListPersonalNotesAsync(userId, requestDto.Search);
 
 		return Ok(notes);
 	}
@@ -82,6 +84,7 @@ public class NotesController : ControllerBase
 	public class ResponseTagDto
 	{
 		public required Guid Id { get; set; }
+		public required Guid TagId { get; set; }
 		public required Guid TagGroupId { get; set; }
 		public required string Name { get; set; }
 	}
@@ -101,6 +104,7 @@ public class NotesController : ControllerBase
 			Tags = note.Tags.Select(x => new ResponseTagDto
 			{
 				Id = x.Id,
+				TagId = x.TagId,
 				TagGroupId = x.Tag.GroupId,
 				Name = x.Tag.Name
 			}).ToList()
@@ -162,5 +166,61 @@ public class NotesController : ControllerBase
 		if (note.Embedding != null)
 			responseDto.Embedding = note.Embedding.Value.ToArray();
 		return responseDto;
+	}
+
+	[HttpPost("{noteId:guid}/tags/{tagId:guid}")]
+	public async Task<IActionResult> AddTagAsync([FromRoute] Guid noteId, [FromRoute] Guid tagId)
+	{
+		var userId = User.GetUserId();
+
+		var error = await _notesService.AddTagAsync(userId, noteId, tagId);
+		if (error != null)
+			return StatusCode(error.StatusCode, error.Message);
+
+		return Ok();
+	}
+
+	[HttpDelete("{noteId:guid}/tags/{tagId:guid}")]
+	public async Task<IActionResult> RemoveTagAsync([FromRoute] Guid noteId, [FromRoute] Guid tagId)
+	{
+		var userId = User.GetUserId();
+
+		var error = await _notesService.RemoveTagAsync(userId, noteId, tagId);
+		if (error != null)
+			return StatusCode(error.StatusCode, error.Message);
+
+		return Ok();
+	}
+
+	[HttpPost("sync-tags")]
+	public async Task<IActionResult> SyncTagsAsync()
+	{
+		var userId = User.GetUserId();
+
+		var error = await _notesService.SyncTagsAsync(userId);
+		if (error != null)
+			return StatusCode(error.StatusCode, error.Message);
+
+		return Ok();
+	}
+
+	public class SuggestTagsResponseDto
+	{
+		public Guid Id { get; set; }
+		public string Name { get; set; }
+	}
+
+	[HttpGet("{noteId:guid}/suggest-tags")]
+	public async Task<ActionResult<List<SuggestTagsResponseDto>>> SuggestTagsAsync([FromRoute] Guid noteId)
+	{
+		var userId = User.GetUserId();
+
+		var (tags, error) = await _notesService.SuggestTagsAsync(userId, noteId);
+		if (error != null)
+			return StatusCode(error.StatusCode, error.Message);
+
+		return tags
+			.Select(x => new SuggestTagsResponseDto { Id = x.Id, Name = x.Name })
+			.ToList();
 	}
 }

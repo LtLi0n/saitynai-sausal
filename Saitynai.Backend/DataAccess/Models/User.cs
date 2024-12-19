@@ -48,7 +48,7 @@ public class User : IEntity
 					Email = "user.useris@email.com",
 					Username = "user",
 					Password = "user123",
-					IsAdmin = true,
+					IsAdmin = false,
 				},
 			});
 		});

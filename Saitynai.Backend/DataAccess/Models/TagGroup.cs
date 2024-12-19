@@ -22,6 +22,8 @@ public class TagGroup : IEntity, IOwnableEntity
 	public Guid? OwnerId { get; set; }
 	public User Owner { get; set; }
 
+	public DateTime CreatedAt { get; set; }
+
 	public static Guid Id1 { get; } = new Guid("7e9a83c8-2bac-418b-af6b-8ddc2ec34ae7");
 
 	public static void CreateModel(ModelBuilder modelBuilder)
@@ -44,7 +46,8 @@ public class TagGroup : IEntity, IOwnableEntity
 				{
 					Id = Id1,
 					OwnerId = User.UserId,
-					Name = "Seeded tag group"
+					Name = "Seeded tag group",
+					CreatedAt = DateTime.MinValue,
 				}
 			});
 		});

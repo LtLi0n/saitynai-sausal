@@ -37,7 +37,7 @@ public class UserService : IUserService
 			return (null, new ResultError(404, "No such user exists."));
 		}
 
-		var token = GenerateJwtToken(existingUser.Id, _configuration);
+		var token = GenerateJwtToken(existingUser, _configuration);
 		return (token, null);
 	}
 
@@ -52,7 +52,7 @@ public class UserService : IUserService
 		return (user, null);
 	}
 
-	private static string GenerateJwtToken(Guid userId, IConfiguration configuration)
+	private static string GenerateJwtToken(User user, IConfiguration configuration)
 	{
 		var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"]);
 		var securityKey = new SymmetricSecurityKey(key);
@@ -60,8 +60,10 @@ public class UserService : IUserService
 
 		var claims = new[]
 		{
-			new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
+			new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+			new Claim(JwtRegisteredClaimNames.PreferredUsername, user.Username),
+			new Claim("is_admin", user.IsAdmin.ToString().ToLower())
 		};
 
 		var token = new JwtSecurityToken(

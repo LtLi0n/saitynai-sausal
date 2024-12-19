@@ -46,6 +46,16 @@ public class Startup
 		services.AddTransient<INotesService, NotesService>();
 		services.AddTransient<ITagsService, TagsService>();
 
+		services.AddCors(x =>
+		{
+			x.AddDefaultPolicy(y =>
+			{
+				y.WithOrigins("http://localhost:5173")
+				.AllowAnyHeader()
+				.AllowAnyMethod();
+			});
+		});
+
 		services.AddEndpointsApiExplorer();
 		services.AddControllers();
 		services.AddSwaggerGen(x =>
@@ -112,6 +122,8 @@ public class Startup
 		});
 
 		app.UseRouting();
+
+		app.UseCors();
 
 		app.UseAuthentication();
 		app.UseAuthorization();
