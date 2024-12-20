@@ -23,7 +23,7 @@ public class NotesController : ControllerBase
 	public class RequestCreateNoteDto
 	{
 		[MinLength(10)]
-		[MaxLength(10_000)]
+		[MaxLength(100_000)]
 		public required string Content { get; set; }
 	}
 
@@ -128,7 +128,7 @@ public class NotesController : ControllerBase
 	public class RequestEditContentDto
 	{
 		[MinLength(10)]
-		[MaxLength(10_000)]
+		[MaxLength(100_000)]
 		public string NewContent { get; set; }
 	}
 	[HttpPatch("{noteId:guid}")]

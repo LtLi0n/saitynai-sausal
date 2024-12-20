@@ -1,0 +1,897 @@
+---
+openapi: 3.0.1
+info:
+  title: Saitynai.Backend
+  version: '1.0'
+paths:
+  "/api/health":
+    get:
+      tags:
+      - Core
+      responses:
+        '200':
+          description: OK
+  "/api/is-logged-in":
+    get:
+      tags:
+      - Core
+      responses:
+        '200':
+          description: OK
+  "/notes":
+    post:
+      tags:
+      - Notes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RequestCreateNoteDto"
+          text/json:
+            schema:
+              "$ref": "#/components/schemas/RequestCreateNoteDto"
+          application/*+json:
+            schema:
+              "$ref": "#/components/schemas/RequestCreateNoteDto"
+      responses:
+        '200':
+          description: OK
+    get:
+      tags:
+      - Notes
+      parameters:
+      - name: Search
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ResponseListNoteDto"
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ResponseListNoteDto"
+            text/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ResponseListNoteDto"
+  "/notes/{noteId}":
+    get:
+      tags:
+      - Notes
+      parameters:
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                "$ref": "#/components/schemas/ResponseGetNoteDto"
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseGetNoteDto"
+            text/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseGetNoteDto"
+    patch:
+      tags:
+      - Notes
+      parameters:
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RequestEditContentDto"
+          text/json:
+            schema:
+              "$ref": "#/components/schemas/RequestEditContentDto"
+          application/*+json:
+            schema:
+              "$ref": "#/components/schemas/RequestEditContentDto"
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+      - Notes
+      parameters:
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+  "/notes/{noteId}/tags":
+    get:
+      tags:
+      - Notes
+      parameters:
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                "$ref": "#/components/schemas/ResponseNoteTagsDto"
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseNoteTagsDto"
+            text/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseNoteTagsDto"
+  "/notes/{noteId}/compute-embedding":
+    post:
+      tags:
+      - Notes
+      parameters:
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+  "/notes/{noteId}/tags/{tagId}":
+    post:
+      tags:
+      - Notes
+      parameters:
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+      - Notes
+      parameters:
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+  "/notes/sync-tags":
+    post:
+      tags:
+      - Notes
+      responses:
+        '200':
+          description: OK
+  "/notes/{noteId}/suggest-tags":
+    get:
+      tags:
+      - Notes
+      parameters:
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/SuggestTagsResponseDto"
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/SuggestTagsResponseDto"
+            text/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/SuggestTagsResponseDto"
+  "/tag-groups":
+    post:
+      tags:
+      - TagGroups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RequestCreateTagGroupDto"
+          text/json:
+            schema:
+              "$ref": "#/components/schemas/RequestCreateTagGroupDto"
+          application/*+json:
+            schema:
+              "$ref": "#/components/schemas/RequestCreateTagGroupDto"
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                "$ref": "#/components/schemas/ResponseGetTagGroupDto"
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseGetTagGroupDto"
+            text/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseGetTagGroupDto"
+  "/tag-groups/{tagGroupId}/tags":
+    post:
+      tags:
+      - TagGroups
+      parameters:
+      - name: tagGroupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RequestCreateTagDto"
+          text/json:
+            schema:
+              "$ref": "#/components/schemas/RequestCreateTagDto"
+          application/*+json:
+            schema:
+              "$ref": "#/components/schemas/RequestCreateTagDto"
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                "$ref": "#/components/schemas/Tag"
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Tag"
+            text/json:
+              schema:
+                "$ref": "#/components/schemas/Tag"
+    get:
+      tags:
+      - TagGroups
+      parameters:
+      - name: tagGroupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: IncludePublicTags
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Tag"
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Tag"
+            text/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Tag"
+  "/tag-groups/list/{parentGroupId}":
+    get:
+      tags:
+      - TagGroups
+      parameters:
+      - name: parentGroupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ResponseListRootTagGroupsDto"
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ResponseListRootTagGroupsDto"
+            text/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ResponseListRootTagGroupsDto"
+  "/tag-groups/{tagGroupId}":
+    get:
+      tags:
+      - TagGroups
+      parameters:
+      - name: tagGroupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                "$ref": "#/components/schemas/ResponseGetTagGroupDto"
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseGetTagGroupDto"
+            text/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseGetTagGroupDto"
+    patch:
+      tags:
+      - TagGroups
+      parameters:
+      - name: tagGroupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RequestEditTagGroupDto"
+          text/json:
+            schema:
+              "$ref": "#/components/schemas/RequestEditTagGroupDto"
+          application/*+json:
+            schema:
+              "$ref": "#/components/schemas/RequestEditTagGroupDto"
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+      - TagGroups
+      parameters:
+      - name: tagGroupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+  "/tag-groups/tags/{tagId}":
+    patch:
+      tags:
+      - TagGroups
+      parameters:
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RequestEditTagDto"
+          text/json:
+            schema:
+              "$ref": "#/components/schemas/RequestEditTagDto"
+          application/*+json:
+            schema:
+              "$ref": "#/components/schemas/RequestEditTagDto"
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+      - TagGroups
+      parameters:
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+  "/users/login":
+    post:
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RequestLoginDto"
+          text/json:
+            schema:
+              "$ref": "#/components/schemas/RequestLoginDto"
+          application/*+json:
+            schema:
+              "$ref": "#/components/schemas/RequestLoginDto"
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                "$ref": "#/components/schemas/ResponseLoginDto"
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseLoginDto"
+            text/json:
+              schema:
+                "$ref": "#/components/schemas/ResponseLoginDto"
+components:
+  schemas:
+    Embedding:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        value:
+          "$ref": "#/components/schemas/Vector"
+      additionalProperties: false
+    Note:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ownerId:
+          type: string
+          format: uuid
+          nullable: true
+        owner:
+          "$ref": "#/components/schemas/User"
+        embeddingId:
+          type: string
+          format: uuid
+          nullable: true
+        embedding:
+          "$ref": "#/components/schemas/Embedding"
+        content:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            "$ref": "#/components/schemas/NoteTag"
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    NoteTag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        noteId:
+          type: string
+          format: uuid
+        note:
+          "$ref": "#/components/schemas/Note"
+        tagId:
+          type: string
+          format: uuid
+        tag:
+          "$ref": "#/components/schemas/Tag"
+      additionalProperties: false
+    RequestCreateNoteDto:
+      required:
+      - content
+      type: object
+      properties:
+        content:
+          maxLength: 100000
+          minLength: 10
+          type: string
+          nullable: true
+      additionalProperties: false
+    RequestCreateTagDto:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          minLength: 1
+          type: string
+          nullable: true
+      additionalProperties: false
+    RequestCreateTagGroupDto:
+      required:
+      - name
+      type: object
+      properties:
+        parentGroupId:
+          type: string
+          format: uuid
+          nullable: true
+        name:
+          maxLength: 100
+          minLength: 1
+          type: string
+          nullable: true
+      additionalProperties: false
+    RequestEditContentDto:
+      type: object
+      properties:
+        newContent:
+          maxLength: 100000
+          minLength: 10
+          type: string
+          nullable: true
+      additionalProperties: false
+    RequestEditTagDto:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        tagGroupId:
+          type: string
+          format: uuid
+          nullable: true
+      additionalProperties: false
+    RequestEditTagGroupDto:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        parentTagGroupId:
+          type: string
+          format: uuid
+          nullable: true
+      additionalProperties: false
+    RequestLoginDto:
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+          nullable: true
+        password:
+          type: string
+          nullable: true
+      additionalProperties: false
+    ResponseGetNoteDto:
+      required:
+      - content
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+          nullable: true
+        embedding:
+          type: array
+          items:
+            type: number
+            format: float
+          nullable: true
+      additionalProperties: false
+    ResponseGetTagGroupDto:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          nullable: true
+        parent:
+          "$ref": "#/components/schemas/ResponseGetTagGroupDto"
+        children:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ResponseGetTagGroupDto"
+          nullable: true
+      additionalProperties: false
+    ResponseListNoteDto:
+      required:
+      - content
+      - id
+      - tags
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+      additionalProperties: false
+    ResponseListRootTagGroupsDto:
+      required:
+      - createdBy
+      - id
+      - isMine
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          nullable: true
+        createdBy:
+          type: string
+          nullable: true
+        isMine:
+          type: boolean
+      additionalProperties: false
+    ResponseLoginDto:
+      required:
+      - token
+      type: object
+      properties:
+        token:
+          type: string
+          nullable: true
+      additionalProperties: false
+    ResponseNoteTagsDto:
+      required:
+      - noteId
+      - tags
+      type: object
+      properties:
+        noteId:
+          type: string
+          format: uuid
+        tags:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ResponseTagDto"
+          nullable: true
+      additionalProperties: false
+    ResponseTagDto:
+      required:
+      - id
+      - name
+      - tagGroupId
+      - tagId
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tagId:
+          type: string
+          format: uuid
+        tagGroupId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          nullable: true
+      additionalProperties: false
+    SingleReadOnlyMemory:
+      type: object
+      properties:
+        length:
+          type: integer
+          format: int32
+          readOnly: true
+        isEmpty:
+          type: boolean
+          readOnly: true
+        span:
+          "$ref": "#/components/schemas/SingleReadOnlySpan"
+      additionalProperties: false
+    SingleReadOnlySpan:
+      type: object
+      properties:
+        length:
+          type: integer
+          format: int32
+          readOnly: true
+        isEmpty:
+          type: boolean
+          readOnly: true
+      additionalProperties: false
+    SuggestTagsResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          nullable: true
+      additionalProperties: false
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        groupId:
+          type: string
+          format: uuid
+        group:
+          "$ref": "#/components/schemas/TagGroup"
+        name:
+          type: string
+          nullable: true
+        contents:
+          type: array
+          items:
+            "$ref": "#/components/schemas/NoteTag"
+          nullable: true
+        embedding:
+          "$ref": "#/components/schemas/Vector"
+        ownerId:
+          type: string
+          format: uuid
+          nullable: true
+        owner:
+          "$ref": "#/components/schemas/User"
+        createdAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    TagGroup:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          nullable: true
+        parentId:
+          type: string
+          format: uuid
+          nullable: true
+        parent:
+          "$ref": "#/components/schemas/TagGroup"
+        tags:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Tag"
+          nullable: true
+        childrenGroups:
+          type: array
+          items:
+            "$ref": "#/components/schemas/TagGroup"
+          nullable: true
+        ownerId:
+          type: string
+          format: uuid
+          nullable: true
+        owner:
+          "$ref": "#/components/schemas/User"
+        createdAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          nullable: true
+        username:
+          type: string
+          nullable: true
+        password:
+          type: string
+          nullable: true
+        isAdmin:
+          type: boolean
+        contents:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Note"
+          nullable: true
+        tagGroups:
+          type: array
+          items:
+            "$ref": "#/components/schemas/TagGroup"
+          nullable: true
+      additionalProperties: false
+    Vector:
+      type: object
+      properties:
+        memory:
+          "$ref": "#/components/schemas/SingleReadOnlyMemory"
+      additionalProperties: false
+  securitySchemes:
+    Bearer:
+      type: http
+      description: Input your Bearer token to access this API
+      scheme: Bearer
+      bearerFormat: JWT
+security:
+- Bearer: []

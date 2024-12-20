@@ -68,8 +68,8 @@ const Note: React.FC = () => {
   }, [noteId]);
 
   const handleSave = async () => {
-    if (content.length < 10 || content.length > 10000) {
-      setError('Note content must be between 10 and 10,000 characters.');
+    if (content.length < 10 || content.length > 100000) {
+      setError('Note content must be between 10 and 100,000 characters.');
       return;
     }
 

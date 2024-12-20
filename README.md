@@ -75,6 +75,24 @@
 - **ASP.NET**
 - **PostgreSQL**
 
+**[Nuoroda](./swagger.json) į OpenAPI**:
+
+## Langai:
+Prisijungimo langas:
+![alt text](res/4.png)
+
+Užrašų sąrašas:
+![alt text](res/d319df09-bf03-4f62-b5f0-7c1d380c9fb1.png "Notes list")
+
+Užrašo peržiūra:
+![alt text](res/5.png)
+
+Žymių grupių sąrašas:
+![alt text](res/2.png)
+
+Žymių sąrašas grupėje:
+![alt text](res/3.png)
+
 
 ## UML deployment diagrama:
 ![alt text](90d27245-3a95-42b6-bd87-e24657d38e90.png "Deployment diagram")
